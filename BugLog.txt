@@ -1,0 +1,56 @@
+The bug log of top 3 most severe bugs found in example "knight_cash_api.py":
+
+Initial "pytest --cov=knight_cash_api --cov-report=html --cov-branch" gave 97% coverage with 33 (Green) and 11 (Reds)
+
+. Missing recipient → unhandled KeyError (500 / internal leak)
+Original
+
+recipient = accounts_db[recipient_id]
+
+Why severe: A bad recipient_id crashed the handler with KeyError: 'user-does-not-exist' instead of a clean 404. 
+That’s a reliability bug and matches the lab’s “500 responses that leak internals” class.
+
+Fix: Currently line 80 marks recipient as a key in DB. Fix line 80 so it calls on "get_account_or_404" to check for recipient instead.
+E.g (get_account_or_404(recipient_id))
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+2. /balance active-check inverted (active users blocked; inactive allowed)
+Original
+
+if account["active"]:
+    raise HTTPException(status_code=403, detail=...)
+
+Why severe: Every active account got 403; inactive accounts still returned a balance. 
+Tests failed with assert 403 == 200 on Alice. That’s both broken access control and a privacy leak.
+
+Fix: Currenly lines 53-54 check if its active, respond with 403 + lacks return statement of accounts_db keys.
+Alter line 52 to check for not active, and add new line that returns user account if active.  
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+3. Insufficient-funds check used <= (exact-balance transfer wrongly rejected)
+Original
+
+if sender["balance"] <= amount:
+    raise HTTPException(status_code=400, detail="Insufficient funds")
+
+Why severe: Transferring your entire balance (a normal boundary case) was treated as overdraft. 
+Wrong money logic at the balance boundary.
+
+Fix: In like 89 it marks Insufficient funds when the value balance is equal to ammount paid.
+Alter like 89 to check account < balance to fix bug
+E.g (sender["balance"] < amount:)
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+Total Coverage: 100% - 44 passed - 2 warning (related to deprecation of few libraries (doesn't effect pytests))
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+For Submission Deliverable:
+
+1. This is BugLog.txt
+
+2. I have shown my initial coverage after running Step 2 for Week4 assignment labeled "InitialCoverage_Step2.png". 
+I have shown my final coverage after running Step 3 for Week4 assignment labeled "Final_Coverage_Step3.png.png".  
+
+3. By the end of step 3 there was 100% coverage so no need to run extra instruction in step 4.
+
+4. https://github.com/lfaife/AII-Augmented-TDD-Branch-Coverage

@@ -1,0 +1,1 @@
+The original developer claims it works perfectly. Write a robust pytest suite, identify the hidden bugs, fix the code, and mathematically prove the system is secure by achieving >95% Branch Coverage.
