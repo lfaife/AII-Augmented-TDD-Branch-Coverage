@@ -1,1 +1,6 @@
-The original developer claims it works perfectly. Write a robust pytest suite, identify the hidden bugs, fix the code, and mathematically prove the system is secure by achieving >95% Branch Coverage.
+The original developer claims it works perfectly. 
+
+Wrote a robust pytest suite: 
+- identified the hidden bugs
+- fixed the code
+- mathematically proved the system is secure by achieving > 95% Branch Coverage.
